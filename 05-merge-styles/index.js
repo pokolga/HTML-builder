@@ -18,7 +18,7 @@ const path = require('path');
         fs.stat(filePath, (err, stats) => {
           if (err) throw new Error(err);
 
-          if (stats.isFile() && currFile.ext === '.css') {
+          if (stats.isFile() && path.extname(file) === '.css') {
             fs.readFile(filePath, 'utf8', (err, data) => {
               if (err) {
                 throw new Error(err);

@@ -11,15 +11,15 @@ const stat = promisify(fs.stat);
 
 // Создание директории project-dist
 async function createProjectDist() {
-  await mkdir('project-dist', { recursive: true });
+  await mkdir(path.join(__dirname,'project-dist'), { recursive: true });
 }
 
 // Замена шаблонных тегов в template.html
 async function replaceTemplateTags() {
-  const templatePath = path.join('template.html');
+  const templatePath = path.join(__dirname, 'template.html');
   let templateContent = await readFile(templatePath, 'utf8');
 
-  const componentsDir = path.join('components');
+  const componentsDir = path.join(__dirname, 'components');
   const componentFiles = await readdir(componentsDir);
 
   for (const file of componentFiles) {
@@ -29,12 +29,12 @@ async function replaceTemplateTags() {
     templateContent = templateContent.replace(new RegExp(tag, 'g'), componentContent);
   }
 
-  await writeFile(path.join('project-dist', 'index.html'), templateContent);
+  await writeFile(path.join(__dirname, 'project-dist', 'index.html'), templateContent);
 }
 
 // Компиляция стилей
 async function compileStyles() {
-  const stylesDir = path.join('styles');
+  const stylesDir = path.join(__dirname,'styles');
   const styleFiles = await readdir(stylesDir);
   let stylesContent = '';
 
@@ -45,17 +45,18 @@ async function compileStyles() {
     }
   }
 
-  await writeFile(path.join('project-dist', 'style.css'), stylesContent);
+  await writeFile(path.join(__dirname, 'project-dist', 'style.css'), stylesContent);
 }
 
 // Копирование папки assets
 async function copyAssets() {
-  const assetsDir = path.join('assets');
-  const projectAssetsDir = path.join('project-dist', 'assets');
+  const assetsDir = path.join(__dirname, 'assets');
+  const projectAssetsDir = path.join(__dirname, 'project-dist', 'assets');
 
   await mkdir(projectAssetsDir, { recursive: true });
-}
-async function copyDir(src, dest) {
+
+
+  async function copyDir(src, dest) {
     const entries = await readdir(src, { withFileTypes: true });
 
     for (const entry of entries) {
@@ -69,11 +70,11 @@ async function copyDir(src, dest) {
         await copyFile(srcPath, destPath);
       }
     }
-  
+  }  
 
   await copyDir(assetsDir, projectAssetsDir);
-}
 
+}
 // Основная функция
 async function buildProject() {
   try {
@@ -81,9 +82,9 @@ async function buildProject() {
     await replaceTemplateTags();
     await compileStyles();
     await copyAssets();
-    console.log('Проект успешно собран!');
+    
   } catch (error) {
-    console.error('Ошибка при сборке проекта:', error);
+    throw new Error(err);
   }
 }
 
